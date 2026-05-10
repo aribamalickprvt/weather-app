@@ -132,7 +132,7 @@
   </div>
 
   <script>
- const API = "/api";
+ const API = "";
 
     async function fetchWeather() {
       const city = document.getElementById("searchInput").value.trim();
@@ -143,8 +143,8 @@
 
       try {
         const [weatherRes, forecastRes] = await Promise.all([
-          fetch(`${API}/weather/${encodeURIComponent(city)}`),
-          fetch(`${API}/forecast/${encodeURIComponent(city)}`)
+        fetch(`/api/weather/${encodeURIComponent(city)}`),
+fetch(`/api/forecast/${encodeURIComponent(city)}`)
         ]);
 
         hideLoading();
