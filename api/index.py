@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import httpx
 import os
+
 app = FastAPI()
 
 app.add_middleware(
@@ -11,12 +12,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-API_KEY = "13f8cd8b5f78721aa60fd3102652ebd7"
+API_KEY = os.environ.get("OPENWEATHER_API_KEY", "")
 BASE_URL = "https://api.openweathermap.org/data/2.5"
 
-@app.get("/")
+
+@app.get("/api")
 def root():
-    return {"message": "Weather API is running"}
+    return {"message": "Weather API is running", "key_set": bool(API_KEY)}
+
 
 @app.get("/api/weather/{city}")
 async def get_weather(city: str):
@@ -28,7 +31,7 @@ async def get_weather(city: str):
     if response.status_code == 404:
         raise HTTPException(status_code=404, detail="City not found")
     if response.status_code != 200:
-        raise HTTPException(status_code=500, detail="Weather API error")
+        raise HTTPException(status_code=500, detail=f"Weather API error: {response.text}")
     data = response.json()
     return {
         "city": data["name"],
@@ -42,6 +45,7 @@ async def get_weather(city: str):
         "visibility": data.get("visibility", 0) // 1000,
         "pressure": data["main"]["pressure"],
     }
+
 
 @app.get("/api/forecast/{city}")
 async def get_forecast(city: str):
