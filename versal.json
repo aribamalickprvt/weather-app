@@ -1,0 +1,11 @@
+{
+    "builds": [
+      { "src": "api/main.py", "use": "@vercel/python" },
+      { "src": "index.html", "use": "@vercel/static" }
+    ],
+    "routes": [
+      { "src": "/weather/(.*)", "dest": "api/main.py" },
+      { "src": "/forecast/(.*)", "dest": "api/main.py" },
+      { "src": "/(.*)", "dest": "index.html" }
+    ]
+  }
