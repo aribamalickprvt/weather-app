@@ -15,11 +15,9 @@ app.add_middleware(
 API_KEY = os.environ.get("OPENWEATHER_API_KEY", "")
 BASE_URL = "https://api.openweathermap.org/data/2.5"
 
-
 @app.get("/api")
 def root():
     return {"message": "Weather API is running", "key_set": bool(API_KEY)}
-
 
 @app.get("/api/weather/{city}")
 async def get_weather(city: str):
@@ -45,7 +43,6 @@ async def get_weather(city: str):
         "visibility": data.get("visibility", 0) // 1000,
         "pressure": data["main"]["pressure"],
     }
-
 
 @app.get("/api/forecast/{city}")
 async def get_forecast(city: str):
