@@ -1,11 +1,7 @@
 {
     "version": 2,
-    "builds": [
-      { "src": "api/main.py", "use": "@vercel/python" }
-    ],
-    "routes": [
-      { "src": "/weather/(.*)", "dest": "api/main.py" },
-      { "src": "/forecast/(.*)", "dest": "api/main.py" },
-      { "src": "/(.*)", "dest": "/$1" }
+    "rewrites": [
+      { "source": "/weather/:city", "destination": "/api/main.py" },
+      { "source": "/forecast/:city", "destination": "/api/main.py" }
     ]
   }
