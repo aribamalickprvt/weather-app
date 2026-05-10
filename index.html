@@ -130,53 +130,99 @@
     </div>
 
   </div>
-<script>
-  const WEATHER_KEY = "13f8cd8b5f78721aa60fd3102652ebd7";
-const BASE = "https://api.openweathermap.org/data/2.5";
 
-async function fetchWeather() {
-  const city = document.getElementById("searchInput").value.trim();
-  if (!city) return;
-  hideAll();
-  showLoading();
+  <script>
+  const API = "https://weather-app-nhuv-gbvnwjaez-aribamalickprvts-projects.vercel.app";
 
-  try {
-    const [weatherRes, forecastRes] = await Promise.all([
-      fetch(`${BASE}/weather?q=${city}&appid=${WEATHER_KEY}&units=metric`),
-      fetch(`${BASE}/forecast?q=${city}&appid=${WEATHER_KEY}&units=metric&cnt=5`)
-    ]);
+    async function fetchWeather() {
+      const city = document.getElementById("searchInput").value.trim();
+      if (!city) return;
 
-    hideLoading();
+      hideAll();
+      showLoading();
 
-    if (!weatherRes.ok) { showError("City not found. Please try again."); return; }
+      try {
+        const [weatherRes, forecastRes] = await Promise.all([
+          fetch(`${API}/weather/${encodeURIComponent(city)}`),
+          fetch(`${API}/forecast/${encodeURIComponent(city)}`)
+        ]);
 
-    const weather = await weatherRes.json();
-    const forecast = await forecastRes.json();
+        hideLoading();
 
-    renderWeather({
-      city: weather.name,
-      country: weather.sys.country,
-      temperature: Math.round(weather.main.temp),
-      feels_like: Math.round(weather.main.feels_like),
-      humidity: weather.main.humidity,
-      description: weather.weather[0].description,
-      icon: weather.weather[0].icon,
-      wind_speed: weather.wind.speed,
-      visibility: (weather.visibility || 0) / 1000,
-    });
+        if (!weatherRes.ok) {
+          document.getElementById("errorBox").classList.remove("hidden");
+          document.getElementById("placeholder").classList.add("hidden");
+          return;
+        }
 
-    renderForecast(forecast.list.map(item => ({
-      time: item.dt_txt,
-      temperature: Math.round(item.main.temp),
-      description: item.weather[0].description,
-      icon: item.weather[0].icon,
-    })));
+        const weather = await weatherRes.json();
+        const forecast = await forecastRes.json();
 
-  } catch (e) {
-    hideLoading();
-    showError("Something went wrong. Please try again.");
-  }
-}
-</script>
+        renderWeather(weather);
+        renderForecast(forecast.forecast);
+
+      } catch (e) {
+        hideLoading();
+        document.getElementById("errorBox").innerText = "Cannot connect to server. Make sure backend is running.";
+        document.getElementById("errorBox").classList.remove("hidden");
+        document.getElementById("placeholder").classList.add("hidden");
+      }
+    }
+
+    function renderWeather(w) {
+      document.getElementById("cityName").innerText = `${w.city}, ${w.country}`;
+      document.getElementById("dateText").innerText = new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
+      document.getElementById("tempText").innerText = `${w.temperature}°C`;
+      document.getElementById("descText").innerText = w.description;
+      document.getElementById("feelsLike").innerText = `${w.feels_like}°C`;
+      document.getElementById("humidity").innerText = `${w.humidity}%`;
+      document.getElementById("wind").innerText = `${w.wind_speed} m/s`;
+      document.getElementById("visibility").innerText = `${w.visibility} km`;
+      document.getElementById("weatherIcon").src = `https://openweathermap.org/img/wn/${w.icon}@2x.png`;
+      document.getElementById("weatherCard").classList.remove("hidden");
+    }
+
+    function renderForecast(list) {
+      const container = document.getElementById("forecastList");
+      container.innerHTML = "";
+      list.forEach(item => {
+        const date = new Date(item.time);
+        const timeStr = date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+        const dateStr = date.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+        container.innerHTML += `
+          <div class="forecast-card glass-light rounded-xl px-4 py-3 flex items-center justify-between cursor-default">
+            <div>
+              <p class="text-white text-sm font-medium">${dateStr}</p>
+              <p class="text-white/40 text-xs">${timeStr}</p>
+            </div>
+            <div class="flex items-center gap-3">
+              <img src="https://openweathermap.org/img/wn/${item.icon}.png" class="w-8 h-8"/>
+              <p class="text-white/60 text-sm">${item.description}</p>
+              <p class="text-white font-semibold">${item.temperature}°C</p>
+            </div>
+          </div>`;
+      });
+      document.getElementById("forecastCard").classList.remove("hidden");
+    }
+
+    function hideAll() {
+      document.getElementById("weatherCard").classList.add("hidden");
+      document.getElementById("forecastCard").classList.add("hidden");
+      document.getElementById("errorBox").classList.add("hidden");
+      document.getElementById("placeholder").classList.add("hidden");
+    }
+
+    function showLoading() {
+      document.getElementById("placeholder").innerText = "Fetching weather...";
+      document.getElementById("placeholder").classList.remove("hidden");
+      document.getElementById("placeholder").classList.add("loading");
+    }
+
+    function hideLoading() {
+      document.getElementById("placeholder").classList.add("hidden");
+      document.getElementById("placeholder").classList.remove("loading");
+    }
+  </script>
+
 </body>
 </html>
