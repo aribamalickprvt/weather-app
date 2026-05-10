@@ -2,10 +2,10 @@
   "version": 2,
   "functions": {
     "api/weather.py": {
-      "runtime": "vercel-python@3.0.7"
+      "runtime": "@vercel/python"
     },
     "api/forecast.py": {
-      "runtime": "vercel-python@3.0.7"
+      "runtime": "@vercel/python"
     }
   }
 }
