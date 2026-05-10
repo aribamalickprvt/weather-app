@@ -18,7 +18,7 @@ BASE_URL = "https://api.openweathermap.org/data/2.5"
 def root():
     return {"message": "Weather API is running"}
 
-@app.get("/weather/{city}")
+@app.get("/api/weather/{city}")
 async def get_weather(city: str):
     async with httpx.AsyncClient() as client:
         response = await client.get(
@@ -43,7 +43,7 @@ async def get_weather(city: str):
         "pressure": data["main"]["pressure"],
     }
 
-@app.get("/forecast/{city}")
+@app.get("/api/forecast/{city}")
 async def get_forecast(city: str):
     async with httpx.AsyncClient() as client:
         response = await client.get(
